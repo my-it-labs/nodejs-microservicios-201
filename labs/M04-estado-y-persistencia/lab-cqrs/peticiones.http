@@ -1,46 +1,56 @@
-### Punto de partida
+### Punto de partida — comandos abre la cuenta
 
-curl -X POST http://127.0.0.1:3002/turnos
+curl -X POST http://127.0.0.1:3001/cuentas -H 'content-type: application/json' -d '{"id":"C-1","titular":"Ana"}'
 
-### Punto de partida
+### Punto de partida — consultas, enseguida y otra vez pasados dos segundos
 
-curl http://127.0.0.1:3002/turnos/T-1
+curl http://127.0.0.1:3002/cuentas/C-1
 
-### 1 — Programar la copia, el GET sigue en la tabla
+### Punto de partida — ingresar 100
 
-curl -X POST http://127.0.0.1:3002/turnos
+curl -X POST http://127.0.0.1:3001/cuentas/C-1/ingresos -H 'content-type: application/json' -d '{"importe":100}'
 
-### 1 — Programar la copia, el GET sigue en la tabla
+### Punto de partida — retirar 80 (lánzala dos veces)
 
-curl http://127.0.0.1:3002/turnos/T-1
+curl -X POST http://127.0.0.1:3001/cuentas/C-1/retiradas -H 'content-type: application/json' -d '{"importe":80}'
 
-### 2 — La consulta lee la copia
+### 1 — Retirar 10 con el saldo en −60
 
-curl -X POST http://127.0.0.1:3002/turnos
+curl -X POST http://127.0.0.1:3001/cuentas/C-1/retiradas -H 'content-type: application/json' -d '{"importe":10}'
 
-### 2 — La consulta lee la copia
+### 1 — Compensar con un ingreso de 100
 
-curl http://127.0.0.1:3002/turnos/T-1
+curl -X POST http://127.0.0.1:3001/cuentas/C-1/ingresos -H 'content-type: application/json' -d '{"importe":100}'
 
-### 2 — La consulta lee la copia
+### 1 — Retirar 50 con el saldo en 40
 
-# Lánzala cuando haya pasado el segundo y medio.
-curl http://127.0.0.1:3002/turnos/T-1
+curl -X POST http://127.0.0.1:3001/cuentas/C-1/retiradas -H 'content-type: application/json' -d '{"importe":50}'
 
-### Comprueba — Borrar la proyección no borra la fila
+### 2 — Ingresar 10 con la proyección arreglada
 
-curl http://127.0.0.1:3002/turnos/T-1
+curl -X POST http://127.0.0.1:3001/cuentas/C-1/ingresos -H 'content-type: application/json' -d '{"importe":10}'
 
-### Reto — Un hueco más largo
+### 2 y 3 — La vista de C-1
 
-curl -X POST http://127.0.0.1:3002/turnos
+# En el paso 2, lánzala pasados dos segundos. En el 3, tras el flushall y el rearranque.
+curl http://127.0.0.1:3002/cuentas/C-1
 
-### Reto — Un hueco más largo
+### Comprueba — Retirar todo con consultas parado
 
-# Lánzala a los 2 segundos del POST. Tiene que seguir en 404.
-curl http://127.0.0.1:3002/turnos/T-1
+curl -X POST http://127.0.0.1:3001/cuentas/C-1/retiradas -H 'content-type: application/json' -d '{"importe":50}'
 
-### Reto — Un hueco más largo
+### Comprueba — Retirar 1 con el saldo en 0
 
-# Lánzala cuando ya hayan pasado los 4 segundos.
-curl http://127.0.0.1:3002/turnos/T-1
+curl -X POST http://127.0.0.1:3001/cuentas/C-1/retiradas -H 'content-type: application/json' -d '{"importe":1}'
+
+### Reto — Abrir C-2
+
+curl -X POST http://127.0.0.1:3001/cuentas -H 'content-type: application/json' -d '{"id":"C-2","titular":"Luis"}'
+
+### Reto — Ingresar 30 en C-2
+
+curl -X POST http://127.0.0.1:3001/cuentas/C-2/ingresos -H 'content-type: application/json' -d '{"importe":30}'
+
+### Reto — Todas las cuentas por saldo
+
+curl http://127.0.0.1:3002/cuentas

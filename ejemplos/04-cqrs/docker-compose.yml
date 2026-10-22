@@ -1,14 +1,22 @@
 services:
-  postgres:
+  # Almacén de eventos. Solo lo usa el servicio de comandos.
+  eventos:
     image: postgres:16
-    container_name: ms-pg-comandas
+    container_name: ms-cqrs-eventos
     environment:
       POSTGRES_PASSWORD: lab
       POSTGRES_DB: comandas
     ports:
       - "5432:5432"
-  redis:
+  # Bus: el stream `comandas`. Comandos escribe en él, consultas lo lee.
+  bus:
     image: redis:7
-    container_name: ms-redis-comandas
+    container_name: ms-cqrs-bus
     ports:
       - "6379:6379"
+  # Vistas de lectura. Solo las usa el servicio de consultas.
+  vistas:
+    image: redis:7
+    container_name: ms-cqrs-vistas
+    ports:
+      - "6380:6379"

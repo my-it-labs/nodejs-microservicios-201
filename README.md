@@ -52,7 +52,7 @@ JavaScript actual (módulos, promesas, `async`/`await`), HTTP (métodos, código
   - [Mongoose](labs/M04-estado-y-persistencia/00-mongoose.md)
   - [Sequelize](labs/M04-estado-y-persistencia/01-sequelize.md)
   - [Redis](labs/M04-estado-y-persistencia/02-redis.md)
-  - [Consistencia eventual y CQRS](labs/M04-estado-y-persistencia/03-cqrs.md)
+  - [CQRS y event sourcing](labs/M04-estado-y-persistencia/03-cqrs.md)
 - **M05 — Seguridad**
   - [JWT](labs/M05-seguridad-y-autenticacion/00-jwt.md)
   - [OAuth y Passport](labs/M05-seguridad-y-autenticacion/01-oauth.md)

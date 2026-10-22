@@ -1,28 +1,67 @@
 {
   "laboratorio": "cqrs",
-  "base": "http://127.0.0.1:3002",
+  "servicios": {
+    "comandos": { "base": "http://127.0.0.1:3001", "almacen": "PostgreSQL cuentas, tabla eventos", "publica": "stream cuentas en 127.0.0.1:6379" },
+    "consultas": { "base": "http://127.0.0.1:3002", "lee": "stream cuentas en 127.0.0.1:6379", "vistas": "Redis 127.0.0.1:6380, claves cuenta:<id> y posicion" }
+  },
+  "eventos": [
+    { "tipo": "CuentaAbierta", "datos": { "titular": "Ana" } },
+    { "tipo": "DineroIngresado", "datos": { "importe": 100 } },
+    { "tipo": "DineroRetirado", "datos": { "importe": 80 } }
+  ],
   "casos": [
     {
-      "nombre": "alta",
+      "nombre": "abrir",
+      "servicio": "comandos",
       "metodo": "POST",
-      "camino": "/turnos",
-      "respuesta": { "status": 201, "cuerpo": { "id": "T-1", "mesa": "4" } },
-      "escritura": { "tabla": "turnos", "fila": { "id": "T-1", "mesa": "4" } }
+      "camino": "/cuentas",
+      "cuerpo": { "id": "C-1", "titular": "Ana" },
+      "respuesta": { "status": 201, "cuerpo": { "id": "C-1", "version": 1, "evento": "CuentaAbierta" } },
+      "escritura": { "tabla": "eventos", "fila": { "agregado": "C-1", "version": 1, "tipo": "CuentaAbierta" } }
+    },
+    {
+      "nombre": "ingresar",
+      "servicio": "comandos",
+      "metodo": "POST",
+      "camino": "/cuentas/C-1/ingresos",
+      "cuerpo": { "importe": 100 },
+      "respuesta": { "status": 201, "cuerpo": { "id": "C-1", "version": 2, "evento": "DineroIngresado" } }
+    },
+    {
+      "nombre": "retirar",
+      "servicio": "comandos",
+      "metodo": "POST",
+      "camino": "/cuentas/C-1/retiradas",
+      "cuerpo": { "importe": 80 },
+      "respuesta": { "status": 201, "cuerpo": { "id": "C-1", "version": 3, "evento": "DineroRetirado" } }
+    },
+    {
+      "nombre": "saldo insuficiente",
+      "servicio": "comandos",
+      "metodo": "POST",
+      "camino": "/cuentas/C-1/retiradas",
+      "cuando": "el importe es mayor que el pliegue de los eventos de C-1",
+      "respuesta": { "status": 409, "cuerpo": { "error": "saldo insuficiente" } }
     },
     {
       "nombre": "aun no proyectado",
+      "servicio": "consultas",
       "metodo": "GET",
-      "camino": "/turnos/T-1",
-      "cuando": "antes de 1,5 s",
+      "camino": "/cuentas/C-1",
+      "cuando": "antes de 1,5 s desde CuentaAbierta",
       "respuesta": { "status": 404, "cuerpo": { "error": "aun no proyectado" } }
     },
     {
-      "nombre": "leido de la copia",
+      "nombre": "vista",
+      "servicio": "consultas",
       "metodo": "GET",
-      "camino": "/turnos/T-1",
-      "cuando": "después de 1,5 s",
-      "respuesta": { "status": 200, "cuerpo": { "id": "T-1", "mesa": "4" } },
-      "lectura": { "clave": "turno:T-1" }
+      "camino": "/cuentas/C-1",
+      "cuando": "1,5 s después del último evento de C-1",
+      "respuesta": {
+        "status": 200,
+        "cuerpo": { "id": "C-1", "titular": "Ana", "saldo": 20, "movimientos": [100, -80], "version": 3 }
+      },
+      "lectura": { "clave": "cuenta:C-1" }
     }
   ]
 }

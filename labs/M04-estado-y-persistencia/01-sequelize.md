@@ -10,4 +10,4 @@ La base del ejemplo se llama `sala`, el usuario es `postgres` y la clave es `lab
 
 La demostración está en [PostgreSQL y Sequelize](../../ejemplos/04-sequelize/README.md). Las dos órdenes imprimen la misma butaca. La segunda no la tiene en memoria.
 
-No hay laboratorio de Sequelize. El de CQRS escribe en PostgreSQL y es donde se practica dejar de leer esa misma tabla.
+No hay laboratorio de Sequelize. El de CQRS usa PostgreSQL como almacén de eventos: solo se añaden filas, y ninguna consulta las lee.

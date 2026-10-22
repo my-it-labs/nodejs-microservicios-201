@@ -9,9 +9,9 @@ Cada dato tiene un sitio, y ese sitio no tiene por qué ser el mismo para escrib
 | Libro | MongoDB, con Mongoose | 00 |
 | Butaca | PostgreSQL, con Sequelize | 01 |
 | Ficha, segunda lectura | Redis delante de Mongo | 02, con laboratorio |
-| Comanda | PostgreSQL al escribir, Redis al leer | 03, con laboratorio. Ahí se ve la consistencia eventual |
+| Comanda | Eventos en PostgreSQL al escribir, vistas en Redis al leer, en dos servicios | 03, con laboratorio. Ahí se ven el event sourcing y la consistencia eventual |
 
-Redis aquí es caché o lado de lectura. No es de donde se recupera el dato si se vacía la memoria.
+Redis aquí es caché o lado de lectura. No es de donde se recupera el dato si se vacía la memoria: en CQRS, las vistas se rehacen con los eventos.
 
 ## Páginas
 
